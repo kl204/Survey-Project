@@ -1,11 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,eclipse,gradle,maven,windows,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,eclipse,gradle,maven,windows,macos
 
-### properties ###
-*.properties
-application-dev.yml
-application-prod.yml
-
 ### idea ###
 .idea
 .idea/*
