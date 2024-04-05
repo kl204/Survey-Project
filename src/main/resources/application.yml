@@ -7,9 +7,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${{secrets.AWS_RDB_URL}}
+    url: ${secrets.AWS_RDB_URL}
     username: root
-    password: ${{secrets.AWS_DB_PASSWORD}}
+    password: ${secrets.AWS_DB_PASSWORD}
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -19,8 +19,8 @@ mybatis:
 cloud:
   aws:
     credentials:
-      access-key: ${{secrets.AWS_ACCESS_KEY}}
-      secret-key: ${{secrets.AWS_SECRET_KEY}}
+      access-key: ${secrets.AWS_ACCESS_KEY}
+      secret-key: ${secrets.AWS_SECRET_KEY}
     region:
       static: us-east-1
     stack:
@@ -28,7 +28,7 @@ cloud:
 
 s3:
   bucket:
-    name: ${{secrets.AWS_S3_NAME}}
+    name: ${secrets.AWS_S3_NAME}
     folder: survey/
 
 
