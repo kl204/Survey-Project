@@ -3,12 +3,26 @@ name: Call GitHub API
 on: [push]
 
 jobs:
-  call-api:
+  list-directories:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          pwd
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: List current directory contents
+        run: |
+          echo "Listing contents of $PWD"
           ls -la
-          echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
+
+      - name: List src directory contents
+        run: |
+          echo "Listing contents of $PWD/src"
+          ls -la src/
+
+      - name: List src/main directory contents
+        run: |
+          echo "Listing contents of $PWD/src/main"
+          ls -la src/main/
+
 
 
