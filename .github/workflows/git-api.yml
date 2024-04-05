@@ -1,0 +1,13 @@
+name: Call GitHub API
+
+on: [push]
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.G_KEY }}
+        run: |
+          curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/kl204/Survey-Project-Backend/actions/secrets
