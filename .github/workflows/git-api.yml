@@ -9,4 +9,6 @@ jobs:
       - run: |
           mkdir -p ./src/main/resources/
           echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
+          cat ./src/main/resources/application.properties
+          ls -la ./src/main/resources/
 
