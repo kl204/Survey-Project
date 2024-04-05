@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "${{ secrets.properties }}" > ./src/main/resources/application.properties
+          echo "${{ secrets.properties }}" > ./src/main/resources/
 
 
