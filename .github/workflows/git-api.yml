@@ -21,8 +21,8 @@ jobs:
 
       - name: List src/main directory contents
         run: |
-          echo "Listing contents of $PWD/src/main/resource"
-          ls -la src/main/resource
+          echo "Listing contents of $PWD/src/main/resources"
+          ls -la src/main/resources
 
 
 
