@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   call-api:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - run: echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.yml
 
