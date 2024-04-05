@@ -6,8 +6,5 @@ jobs:
   call-api:
     runs-on: self-hosted
     steps:
-      - name: Call GitHub API
-        env:
-          GITHUB_TOKEN: ${{ secrets.$GITHUB_TOKEN }}
-        run: |
-          curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/kl204/Survey-Project-Backend/actions/secrets
+      - run: echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.yml
+
