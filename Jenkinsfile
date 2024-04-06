@@ -34,7 +34,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['Survey-pem']) {
                     script {
-                        sh "ssh ${REMOTE_SERVER} 'mkdir -p ${TARGET_PATH}'"
+
                         sh "scp ${buildArtifact} ${remoteServer}:${targetPath}"
 
                         sh "ssh ${remoteServer} 'cd ${targetPath} && ./restart-spring-boot-app.sh'"
