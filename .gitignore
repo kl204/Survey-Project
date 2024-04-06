@@ -3,7 +3,7 @@
 
 
 ## dev-properties##
-.application-dev.properties
+application-dev.properties
 
 ### idea ###
 .idea
