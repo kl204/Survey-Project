@@ -35,9 +35,9 @@ pipeline {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
 
-                        sh "sudo scp -o StrictHostKeyChecking=no ${BUILD_ARTIFACT} ${REMOTE_SERVER}:${TARGET_PATH}"
+                        scp -o StrictHostKeyChecking=no target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp
+                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar /SurveyProject'
 
-                        sh "ssh -o StrictHostKeyChecking=no ${REMOTE_SERVER} 'cd ${TARGET_PATH} && ./restart-spring-boot-app.sh'"
                     }
                 }
             }
