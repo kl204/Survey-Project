@@ -11,9 +11,24 @@ pipeline {
                 checkout scm
             }
         }
+
+        // Maven Wrapper 생성 단계 추가
+        stage('Setup Maven Wrapper') {
+            steps {
+                // Maven이 이미 설치되어 있고, mvn 명령어를 사용할 수 있는 경우
+                script {
+                    // .mvn 디렉토리 또는 mvnw 파일이 존재하지 않을 때만 Maven Wrapper 생성
+                    if (!fileExists('.mvn/wrapper/maven-wrapper.jar') || !fileExists('mvnw')) {
+                        sh 'mvn -N io.takari:maven:wrapper'
+                        // Linux 환경에서 실행 권한 부여
+                        sh 'chmod +x mvnw'
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'chmod +x ./mvnw'
                 sh './mvnw clean package'
             }
         }
