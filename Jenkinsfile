@@ -32,7 +32,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(credentials: ['Survey-pem']) {
+                sshagent(credentials: ['SurveyProject']) {
                     script {
 
                         sh "scp ${buildArtifact} ${remoteServer}:${targetPath}"
