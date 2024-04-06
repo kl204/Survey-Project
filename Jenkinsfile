@@ -12,6 +12,14 @@ pipeline {
             }
         }
 
+        stage('Prepare application.properties') {
+            steps {
+                withCredentials([file(credentialsId: 'application', variable: 'PROP_FILE')]) {
+                    sh 'cp $PROP_FILE src/main/resources/application.properties'
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'chmod +x ./mvnw'
@@ -24,7 +32,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sshagent(credentials: ['ssh-key-pairs']) {
+                sshagent(credentials: ['Survey-pem']) {
                     script {
                         def remoteServer = 'ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com'
                         def targetPath = '/path/to/deploy/location/on/ec2'
