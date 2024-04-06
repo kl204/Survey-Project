@@ -17,7 +17,7 @@ public class TestVO {
 
     public TestVO(){
         this.userNo= 1;
-        this.userNickname = "admin";
+        this.userNickname = "김선규";
         this.userGender= "M";
         this.userEmail= "kl204@naver.com";
         this.userBirth= new Date();
