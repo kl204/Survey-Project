@@ -35,8 +35,8 @@ pipeline {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
 
-                        scp -o StrictHostKeyChecking=no target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp
-                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar /SurveyProject'
+                       sh "scp -o StrictHostKeyChecking=no target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp"
+                       sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar /SurveyProject'"
 
                     }
                 }
