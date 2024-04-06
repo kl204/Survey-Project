@@ -19,7 +19,7 @@ pipeline {
                 script {
                     // .mvn 디렉토리 또는 mvnw 파일이 존재하지 않을 때만 Maven Wrapper 생성
                     if (!fileExists('.mvn/wrapper/maven-wrapper.jar') || !fileExists('mvnw')) {
-                        sh 'mvn -N io.takari:maven:wrapper'
+                        sh 'mvnw -N io.takari:maven:wrapper'
                         // Linux 환경에서 실행 권한 부여
                         sh 'chmod +x mvnw'
                     }
