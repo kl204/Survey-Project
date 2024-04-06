@@ -34,14 +34,15 @@ pipeline {
             steps {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
-
-                       sh "scp -o StrictHostKeyChecking=no target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp"
-                       sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar /SurveyProject'"
-
+                        sh "scp -o StrictHostKeyChecking=no target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar /SurveyProject'"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo pkill -f survey-management'"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'nohup sudo java -jar /SurveyProject/survey-management-0.0.1-SNAPSHOT.jar > /SurveyProject/log.txt 2>&1 &'"
                     }
                 }
             }
         }
+
     }
 
     post {
