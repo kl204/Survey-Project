@@ -5,6 +5,7 @@ pipeline {
         JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-11.0.22.0.7-1.amzn2.0.1.x86_64'
     }
 
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
