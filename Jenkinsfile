@@ -6,6 +6,24 @@ pipeline {
     }
 
     stages {
+        stage('Preparation') {
+            steps {
+                script {
+                    if (sh(script: 'which mvn', returnStatus: true) != 0) {
+                        echo 'Maven is not installed. Installing Maven...'
+                        sh 'wget https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz -P /tmp'
+                        sh 'tar xf /tmp/apache-maven-3.8.8-bin.tar.gz -C /opt'
+                        sh 'ln -s /opt/apache-maven-3.8.8/bin/mvn /usr/bin/mvn'
+                    }
+
+                    if (!fileExists('.mvn/wrapper/maven-wrapper.jar') || !fileExists('mvnw')) {
+                        sh 'mvn -N io.takari:maven:wrapper'
+                        sh 'chmod +x ./mvnw'
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
