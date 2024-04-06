@@ -35,7 +35,7 @@ pipeline {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
 
-                        sh "scp -o StrictHostKeyChecking=no ${BUILD_ARTIFACT} ${REMOTE_SERVER}:${TARGET_PATH}"
+                        sh "sudo scp -o StrictHostKeyChecking=no ${BUILD_ARTIFACT} ${REMOTE_SERVER}:${TARGET_PATH}"
 
                         sh "ssh -o StrictHostKeyChecking=no ${REMOTE_SERVER} 'cd ${TARGET_PATH} && ./restart-spring-boot-app.sh'"
                     }
