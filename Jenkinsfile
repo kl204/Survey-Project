@@ -31,9 +31,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'master'
-            }
             steps {
                 sshagent(credentials: ['Survey-pem']) {
                     script {
