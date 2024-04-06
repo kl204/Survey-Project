@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven3'
-    }
-
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-11.0.22.7-1.amzn2.0.1.x86_64'
     }
@@ -17,7 +13,8 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvnw clean package'
+
+                sh './mvnw clean package'
             }
         }
 
@@ -26,7 +23,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sshagent(['ssh-key-pairs']) {
+                sshagent(credentials: ['ssh-key-pairs']) {
                     script {
                         def remoteServer = 'ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com'
                         def targetPath = '/path/to/deploy/location/on/ec2'
