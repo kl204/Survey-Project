@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-11.0.22.0.7-1.amzn2.0.1.x86_64'
+        REMOTE_SERVER = 'ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com'
+        TARGET_PATH = '/SurveyProject'
+        BUILD_ARTIFACT = '/target/survey-management-0.0.1-SNAPSHOT.jar'
     }
 
     stages {
@@ -23,7 +26,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'chmod +x ./mvnw'
-                sh './mvnw clean install -DskipTests'
+                sh './mvnw clean package -DskipTests'
             }
         }
 
@@ -34,10 +37,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['Survey-pem']) {
                     script {
-                        def remoteServer = 'ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com'
-                        def targetPath = '/path/to/deploy/location/on/ec2'
-                        def buildArtifact = 'target/your-spring-boot-app.jar'
-
+                        sh "ssh ${REMOTE_SERVER} 'mkdir -p ${TARGET_PATH}'"
                         sh "scp ${buildArtifact} ${remoteServer}:${targetPath}"
 
                         sh "ssh ${remoteServer} 'cd ${targetPath} && ./restart-spring-boot-app.sh'"
