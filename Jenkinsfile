@@ -27,13 +27,26 @@ pipeline {
             steps {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
+                        // 실행 중인 애플리케이션 종료
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com '
+                        pgrep -f survey-management-0.0.1-SNAPSHOT.jar | xargs -r sudo kill
+                        '
+                        """
+
+                        // JAR 파일 전송
                         sh "scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/SurveyProject/target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp"
+
+                        // JAR 파일 이동
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo mv /tmp/survey-management-0.0.1-SNAPSHOT.jar ./SurveyProject'"
+
+                        // 애플리케이션 재시작
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'nohup sudo java -jar ./SurveyProject/survey-management-0.0.1-SNAPSHOT.jar > ./SurveyProject/log.txt 2>&1 &'"
                     }
                 }
             }
         }
+
 
     }
 
