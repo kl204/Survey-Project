@@ -8,11 +8,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("https://survey-project-frontend.vercel.app/")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
+        registry.addMapping("/**") // 모든 경로에 대해
+                .allowedOrigins("*") // 모든 출처 허용
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // 허용할 HTTP 메소드 지정
+                .allowedHeaders("*") // 모든 헤더 허용
+                .allowCredentials(true) // 쿠키를 포함한 요청 허용
+                .maxAge(3600); // pre-flight 요청의 결과를 3600초 동안 캐시
     }
 }
