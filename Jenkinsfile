@@ -30,15 +30,15 @@ pipeline {
                         // 특정 포트를 사용하는 애플리케이션의 프로세스 ID 찾기
                         def pid = sh(script: """
                             ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com '
-                            lsof -ti :8090
+                            sudo netstat -tulnp | grep ":8090" | awk '{print \$7}' | cut -d"/" -f1
                             '
                         """, returnStdout: true).trim()
 
                         // 애플리케이션 프로세스가 존재하면 종료
-                        if (pid) {
+                        if (pid && pid.isDigit()) {
                             sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo kill -SIGTERM ${pid}'"
                             // 프로세스 종료 확인
-                            sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'while kill -0 ${pid}; do sleep 1; done'"
+                            sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'while sudo kill -0 ${pid} 2> /dev/null; do sleep 1; done'"
                         }
 
                         // JAR 파일 전송
@@ -53,7 +53,7 @@ pipeline {
                 }
             }
         }
-    }
+
 
     post {
         always {
