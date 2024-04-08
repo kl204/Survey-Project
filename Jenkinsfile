@@ -7,10 +7,9 @@ pipeline {
             steps {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
-                        // 포트 8090을 사용하는 프로세스 종료 시도
-                        sh """
+                        sh '''
                         ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com '
-                        PID=$(sudo netstat -tulnp | grep ":8090" | awk '\''{print \$7}'\'' | cut -d"/" -f1)
+                        PID=$(sudo netstat -tulnp | grep ":8090" | awk '\''{print $7}'\'' | cut -d"/" -f1)
                         if [ -n "$PID" ]; then
                             echo "Killing process $PID on port 8090."
                             sudo kill -SIGTERM $PID
@@ -23,12 +22,12 @@ pipeline {
                             echo "No process running on port 8090."
                         fi
                         '
-
-                        """
+                        '''
                     }
                 }
             }
         }
+
 
         stage('Checkout') {
             steps {
