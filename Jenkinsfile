@@ -27,12 +27,19 @@ pipeline {
             steps {
                 sshagent(credentials: ['SurveyProject']) {
                     script {
-                        // 실행 중인 애플리케이션 종료
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com '
-                        pgrep -f survey-management-0.0.1-SNAPSHOT.jar | xargs -r sudo kill
-                        '
-                        """
+                        // 특정 포트를 사용하는 애플리케이션의 프로세스 ID 찾기
+                        def pid = sh(script: """
+                            ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com '
+                            lsof -ti :8090
+                            '
+                        """, returnStdout: true).trim()
+
+                        // 애플리케이션 프로세스가 존재하면 종료
+                        if (pid) {
+                            sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'sudo kill -SIGTERM ${pid}'"
+                            // 프로세스 종료 확인
+                            sh "ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com 'while kill -0 ${pid}; do sleep 1; done'"
+                        }
 
                         // JAR 파일 전송
                         sh "scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/SurveyProject/target/survey-management-0.0.1-SNAPSHOT.jar ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com:/tmp"
@@ -46,8 +53,6 @@ pipeline {
                 }
             }
         }
-
-
     }
 
     post {
