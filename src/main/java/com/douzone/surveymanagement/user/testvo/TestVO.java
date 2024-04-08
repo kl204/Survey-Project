@@ -16,7 +16,7 @@ public class TestVO {
     private final String userImage;
 
     public TestVO(){
-        this.userNo= 1;
+        this.userNo= 5;
         this.userNickname = "김선규";
         this.userGender= "M";
         this.userEmail= "kl204@naver.com";
