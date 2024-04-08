@@ -1,13 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-11.0.22.0.7-1.amzn2.0.1.x86_64'
-        REMOTE_SERVER = 'ec2-user@ec2-44-207-93-37.compute-1.amazonaws.com'
-        TARGET_PATH = '/SurveyProject'
-        BUILD_ARTIFACT = 'target/survey-management-0.0.1-SNAPSHOT.jar'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -17,7 +10,7 @@ pipeline {
 
         stage('Prepare application.properties') {
             steps {
-                withCredentials([file(credentialsId: 'application', variable: 'PROP_FILE')]) {
+                withCredentials([file(credentialsId: 'application_', variable: 'PROP_FILE')]) {
                     sh 'cp $PROP_FILE src/main/resources/application.properties'
                 }
             }

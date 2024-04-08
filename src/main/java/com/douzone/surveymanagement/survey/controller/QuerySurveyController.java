@@ -66,7 +66,7 @@ public class QuerySurveyController {
     ) {
         long userNo = testVO.getUserNo();
         List<SurveyDetailInfoDto> weeklySurvey = querySurveyService.readWeeklySurvey(userNo);
-        return ResponseEntity.ok(weeklySurvey);
+            return ResponseEntity.ok(weeklySurvey);
     }
 
     /**
