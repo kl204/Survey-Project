@@ -8,7 +8,9 @@ import com.douzone.surveymanagement.surveyattend.dto.request.SurveyAttendDTO;
 import com.douzone.surveymanagement.surveyattend.dto.request.SurveyAttendSubmitDTO;
 import com.douzone.surveymanagement.surveyattend.exception.SurveyAttendException;
 import com.douzone.surveymanagement.surveyattend.service.SurveyAttendService;
-//import com.douzone.surveymanagement.user.util.CustomUserDetails;
+import com.douzone.surveymanagement.user.dto.UserInfo;
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,16 +18,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.douzone.surveymanagement.user.testvo.TestVO;
-
 
 /**
  * 설문 참여 관련 작업을 담당하는 컨트롤러입니다.
@@ -42,7 +41,7 @@ public class SurveyAttendController {
 
     private final QuerySurveyService querySurveyService;
 
-    private final TestVO testVO;
+    private final OAuth2UserMapper userMapper;
 
 
     /**
@@ -53,12 +52,13 @@ public class SurveyAttendController {
     @Operation(summary = "설문 데이터 가져오기", description = "설문 참여를 위한 데이터를 조회합니다.")
     @GetMapping("/survey-data/{surveyNo}")
     public ResponseEntity<CommonResponse> getSurveyData(
-        @PathVariable("surveyNo") long surveyNo
-//        @AuthenticationPrincipal CustomUserDetails customUserDetails
+        @PathVariable("surveyNo") long surveyNo,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         boolean isSurveyCreatedByUser = querySurveyService.isSurveyCreatedByUser(
-                testVO.getUserNo(),
+                userInfo.getUserNo(),
             surveyNo
         );
 

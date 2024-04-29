@@ -3,10 +3,13 @@ package com.douzone.surveymanagement.user.controller;
 import com.douzone.surveymanagement.common.annotation.S3DeleteObject;
 import com.douzone.surveymanagement.common.response.CommonResponse;
 import com.douzone.surveymanagement.common.response.ErrorResponse;
+import com.douzone.surveymanagement.user.dto.UserInfo;
 import com.douzone.surveymanagement.user.dto.request.ImageModifyDTO;
 import com.douzone.surveymanagement.user.dto.request.UserDTO;
 import com.douzone.surveymanagement.user.dto.request.UserModifyDTO;
 import com.douzone.surveymanagement.user.exception.DuplicateUsernameException;
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import com.douzone.surveymanagement.user.service.impl.UserServiceImpl;
 //import com.douzone.surveymanagement.user.util.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,15 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.douzone.surveymanagement.user.testvo.TestVO;
-
 
 /**
  * 유저 API 컨트롤러 클래스입니다.
@@ -39,17 +40,19 @@ import com.douzone.surveymanagement.user.testvo.TestVO;
 @RequiredArgsConstructor
 public class UserController {
     private final UserServiceImpl userServiceImpl;
-    private final TestVO testVO;
+    private final OAuth2UserMapper userMapper;
 
 
     @PutMapping("/nickname")
     @Operation(summary = "사용자 닉네임 업데이트", description = "로그인한 사용자의 닉네임을 업데이트합니다.")
     public ResponseEntity<CommonResponse> userNickNameUpdate(
-//        @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
         @Valid @RequestBody UserModifyDTO userModifyDTO) {
 
         try {
-            userModifyDTO.setUserNo(testVO.getUserNo());
+            UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+            userModifyDTO.setUserNo(userInfo.getUserNo());
             userServiceImpl.updateUserNickName(userModifyDTO);
             return ResponseEntity
                 .ok()
@@ -68,11 +71,13 @@ public class UserController {
     @PutMapping("/image")
     @Operation(summary = "사용자 이미지 업데이트", description = "로그인한 사용자의 프로필 이미지를 업데이트합니다.")
     public ResponseEntity<CommonResponse> updateUserImage(
-//        @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
         @RequestBody ImageModifyDTO userImage) {
 
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
         boolean updated =
-            userServiceImpl.updateUserImage(testVO.getUserNo(), userImage.getUserImage());
+            userServiceImpl.updateUserImage(userInfo.getUserNo(), userImage.getUserImage());
 
         if (updated) {
             return ResponseEntity
@@ -88,14 +93,15 @@ public class UserController {
     @GetMapping("/user-info")
     @Operation(summary = "현재 로그인한 사용자 정보 조회", description = "현재 로그인한 사용자의 상세 정보를 조회합니다.")
     public ResponseEntity<UserDTO> getCurrentUser(
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
 
-        if (testVO == null) {
+        if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        UserDTO userDTO = userServiceImpl.getUserByUserNo(testVO.getUserNo());
+        UserDTO userDTO = userServiceImpl.getUserByUserNo(userInfo.getUserNo());
 
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

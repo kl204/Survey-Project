@@ -4,21 +4,21 @@ import com.douzone.surveymanagement.common.response.CommonResponse;
 import com.douzone.surveymanagement.common.response.ErrorResponse;
 import com.douzone.surveymanagement.mysurvey.dto.request.MySurveyDTO;
 import com.douzone.surveymanagement.mysurvey.service.impl.MySurveyServiceImpl;
+import com.douzone.surveymanagement.user.dto.UserInfo;
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.douzone.surveymanagement.user.testvo.TestVO;
-
 
 /**
  * MyPage Survey API 컨트롤러 클래스입니다.
@@ -35,7 +35,7 @@ import com.douzone.surveymanagement.user.testvo.TestVO;
 public class MySurveyController {
 
     private final MySurveyServiceImpl mySurveyServiceImpl;
-    private final TestVO testVO;
+    private final OAuth2UserMapper userMapper;
 
     /**
      * 사용자가 작성한 설문 목록을 가져옵니다.
@@ -48,12 +48,15 @@ public class MySurveyController {
     )
     @GetMapping("/write-surveys")
     public ResponseEntity<CommonResponse<List<MySurveyDTO>>> selectMySurvey(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
        ) {
-        if (testVO == null) {
+        if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
         List<MySurveyDTO> myWriteSurveys =
-            mySurveyServiceImpl.selectMySurveysWithSorting(testVO.getUserNo());
+            mySurveyServiceImpl.selectMySurveysWithSorting(userInfo.getUserNo());
 
         return ResponseEntity.ok(CommonResponse.successOf(myWriteSurveys));
     }
@@ -70,12 +73,15 @@ public class MySurveyController {
     )
     @GetMapping("/attend-surveys")
     public ResponseEntity<CommonResponse<List<MySurveyDTO>>> selectAttendSurvey(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
         ) {
-        if (testVO == null) {
+        if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
         List<MySurveyDTO> myAttendSurveys =
-            mySurveyServiceImpl.selectMyParticipatedSurveys(testVO.getUserNo());
+            mySurveyServiceImpl.selectMyParticipatedSurveys(userInfo.getUserNo());
 
         return ResponseEntity.ok(CommonResponse.successOf(myAttendSurveys));
     }
@@ -86,12 +92,17 @@ public class MySurveyController {
     )
     @PutMapping("/update-write-surveys")
     public ResponseEntity<CommonResponse> updateMySurvey(
-        @RequestBody MySurveyDTO mySurveyDTO
-        ) {
-        if (testVO == null) {
+        @RequestBody MySurveyDTO mySurveyDTO,
+                    @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+
+    ) {
+        if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        mySurveyDTO.setUserNo(testVO.getUserNo());
+
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        mySurveyDTO.setUserNo(userInfo.getUserNo());
         boolean isDeleted = mySurveyServiceImpl.deleteMySurveyInProgress(mySurveyDTO);
         if (isDeleted) {
             return ResponseEntity.ok(CommonResponse.successOf("Survey deleted successfully"));

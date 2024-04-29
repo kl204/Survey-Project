@@ -9,20 +9,21 @@ import com.douzone.surveymanagement.survey.dto.request.SurveyUpdateDto;
 import com.douzone.surveymanagement.survey.service.CommandSurveyService;
 import com.douzone.surveymanagement.survey.service.QuerySurveyService;
 //import com.douzone.surveymanagement.user.util.CustomUserDetails;
+import com.douzone.surveymanagement.user.dto.UserInfo;
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.douzone.surveymanagement.user.testvo.TestVO;
 
 
 /**
@@ -37,7 +38,7 @@ public class CommandSurveyController {
 
     private final CommandSurveyService commandSurveyService;
     private final QuerySurveyService querySurveyService;
-    private final TestVO testVO;
+    private final OAuth2UserMapper userMapper;
 
 
     /**
@@ -54,11 +55,13 @@ public class CommandSurveyController {
     @RequiredUser
     @PostMapping
     public ResponseEntity<CommonResponse<String>> surveyCreate(
-        @RequestBody SurveyCreateDto surveyCreateDto
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestBody SurveyCreateDto surveyCreateDto,
+        @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
 
-        surveyCreateDto.getSurveyInfoCreateDto().setUserNo(testVO.getUserNo());
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        surveyCreateDto.getSurveyInfoCreateDto().setUserNo(userInfo.getUserNo());
 
         commandSurveyService.insertSurvey(
             surveyCreateDto.getSurveyInfoCreateDto(),
@@ -83,11 +86,14 @@ public class CommandSurveyController {
     @S3DeleteObject
     @PutMapping
     public ResponseEntity<CommonResponse<String>> surveyUpdate(
-        @RequestBody SurveyUpdateDto surveyUpdateDto
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestBody SurveyUpdateDto surveyUpdateDto,
+        @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+
     ) {
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
         boolean surveyCreatedByUser = querySurveyService.isSurveyCreatedByUser(
-                testVO.getUserNo(),
+                userInfo.getUserNo(),
             surveyUpdateDto.getSurveyInfoUpdateDto().getSurveyNo()
         );
 
@@ -117,12 +123,13 @@ public class CommandSurveyController {
     @RequiredUser
     @PutMapping("/{surveyNo}/post")
     public ResponseEntity<CommonResponse<String>> surveyStatusToPostFromInProgress(
-        @PathVariable(value = "surveyNo") long surveyNo
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @PathVariable(value = "surveyNo") long surveyNo,
+        @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         if (!querySurveyService.isSurveyCreatedByUser(
-                testVO.getUserNo(),
+                userInfo.getUserNo(),
             surveyNo
         )) {
             throw new BadRequestException("선택한 설문을 삭제할 수 없습니다.");

@@ -4,20 +4,20 @@ import com.douzone.surveymanagement.common.response.CommonResponse;
 import com.douzone.surveymanagement.survey.dto.response.SurveyDetailInfoDto;
 import com.douzone.surveymanagement.survey.dto.response.SurveyDetailsDto;
 import com.douzone.surveymanagement.survey.service.QuerySurveyService;
-//import com.douzone.surveymanagement.user.util.CustomUserDetails;
+import com.douzone.surveymanagement.user.dto.UserInfo;
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.douzone.surveymanagement.user.testvo.TestVO;
 
 /**
  * 설문에 대해 조회를 담당하는 역할을 클래스 입니다.
@@ -32,7 +32,7 @@ import com.douzone.surveymanagement.user.testvo.TestVO;
 public class QuerySurveyController {
 
     private final QuerySurveyService querySurveyService;
-    private final TestVO testVO;
+    private final OAuth2UserMapper userMapper;
 
 
     /**
@@ -62,9 +62,12 @@ public class QuerySurveyController {
     )
     @GetMapping("/weekly")
     public ResponseEntity<List<SurveyDetailInfoDto>> weeklySurveyList(
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> weeklySurvey = querySurveyService.readWeeklySurvey(userNo);
             return ResponseEntity.ok(weeklySurvey);
     }
@@ -77,9 +80,12 @@ public class QuerySurveyController {
     @Operation(summary = "최근 등록된 설문 조회", description = "최근에 등록된 설문 10개를 조회합니다.")
     @GetMapping("/recent")
     public ResponseEntity<List<SurveyDetailInfoDto>> recentSurveyList(
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> recentSurvey = querySurveyService.readRecentSurvey(userNo);
         return ResponseEntity.ok(recentSurvey);
     }
@@ -92,9 +98,11 @@ public class QuerySurveyController {
     @Operation(summary = "최근 마감된 설문 조회", description = "최근에 마감된 순서대로 설문 10개를 조회합니다.")
     @GetMapping("/closing")
     public ResponseEntity<List<SurveyDetailInfoDto>> closingSurveyList(
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> closingSurvey = querySurveyService.readClosingSurvey(userNo);
         return ResponseEntity.ok(closingSurvey);
     }
@@ -111,10 +119,12 @@ public class QuerySurveyController {
     )
     @GetMapping("/surveyall")
     public ResponseEntity<List<SurveyDetailInfoDto>> getAllSurvey(
-        @RequestParam("page") int page
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestParam("page") int page,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> allSurvey = querySurveyService.getSurveyAll(page, userNo);
         return ResponseEntity.ok(allSurvey);
     }
@@ -128,10 +138,12 @@ public class QuerySurveyController {
     @GetMapping("/select-closing")
     @Operation(summary = "마감된 설문 페이징 조회", description = "마감된 설문을 페이지별로 20개씩 조회합니다.")
     public ResponseEntity<List<SurveyDetailInfoDto>> selectClosingSurveyList(
-        @RequestParam("page") int page
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestParam("page") int page,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> closeSurvey = querySurveyService.selectClosing(page, userNo);
         return ResponseEntity.ok(closeSurvey);
     }
@@ -145,10 +157,12 @@ public class QuerySurveyController {
     @GetMapping("/select-post")
     @Operation(summary = "진행중인 설문 페이징 조회", description = "진행 중인 설문을 페이지별로 20개씩 조회합니다.")
     public ResponseEntity<List<SurveyDetailInfoDto>> selectPostSurveyList(
-        @RequestParam("page") int page
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestParam("page") int page,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> postSurvey = querySurveyService.selectPost(page, userNo);
         return ResponseEntity.ok(postSurvey);
     }
@@ -156,10 +170,12 @@ public class QuerySurveyController {
     @GetMapping("/search")
     @Operation(summary = "키워드로 설문 검색", description = "주어진 키워드로 설문을 검색합니다.")
     public ResponseEntity<List<SurveyDetailInfoDto>> findSurveyByKeyword(
-        @RequestParam("searchWord") String searchWord
-//        @AuthenticationPrincipal CustomUserDetails userDetails
+        @RequestParam("searchWord") String searchWord,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        long userNo = testVO.getUserNo();
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
+        long userNo = userInfo.getUserNo();
         List<SurveyDetailInfoDto> findSurvey =
             querySurveyService.searchSurveyByKeyword(searchWord, userNo);
         return ResponseEntity.ok(findSurvey);
@@ -178,12 +194,14 @@ public class QuerySurveyController {
     )
     @GetMapping("/details/{surveyNo}")
     public ResponseEntity<CommonResponse> surveyFindOneDetails(
-        @PathVariable("surveyNo") long surveyNo
-//        @AuthenticationPrincipal CustomUserDetails customUserDetails
+        @PathVariable("surveyNo") long surveyNo,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
+        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+
         SurveyDetailInfoDto surveyDetails =
             querySurveyService.findOneSurveyDetailsBySurveyNo(
-                    testVO.getUserNo(),
+                    userInfo.getUserNo(),
                 surveyNo
             );
 
