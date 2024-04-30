@@ -101,13 +101,21 @@ public class UserController {
         if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        String anonymous_user = customOAuth2User.getUsername();
+        log.info("사용자 체크 : " + anonymous_user + customOAuth2User.getUserEmail() + customOAuth2User.getName());
+
+        if(anonymous_user.equals("ANONYMOUS")){
+
+            UserDTO anonnymous_user = new UserDTO();
+
+            return ResponseEntity.ok(anonnymous_user);
+        }
+
         Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         UserDTO userDTO = userServiceImpl.getUserByUserNo(userInfo.map(UserInfo::getUserNo).orElse(0L));
 
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
 
         return ResponseEntity.ok(userDTO);
     }

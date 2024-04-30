@@ -45,18 +45,6 @@ public class SecurityConfig {
         http    .addFilterAfter(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
-                .anonymous(anonymousConfigurer -> {
-                    UserDTO anonymousUserDTO = new UserDTO(
-                            "Anonymous", // 사용자 이름
-                            "anonymous@example.com", // 익명 이메일
-                            "ANONYMOUS" // 역할
-                    );
-                    anonymousConfigurer.principal(new CustomOAuth2User(
-                            anonymousUserDTO
-                    ));
-                });
-
-        http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
