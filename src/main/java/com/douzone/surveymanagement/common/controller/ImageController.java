@@ -44,7 +44,9 @@ public class ImageController {
         @RequestParam String fileName
     ) {
         try {
+            log.info("이전");
             String preSignedUrl = s3PreSignedUrlGenerator.getPreSignedUrl(fileName);
+            log.info("이후 : " + preSignedUrl);
             return ResponseEntity.ok(CommonResponse.successOf(preSignedUrl));
         } catch (Exception e) {
             log.error("Error generating Pre-Signed URL", e);

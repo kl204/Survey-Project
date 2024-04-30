@@ -1,5 +1,7 @@
 package com.douzone.surveymanagement.common.security;
 
+import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
+import com.douzone.surveymanagement.user.oauth2.dto.UserDTO;
 import com.douzone.surveymanagement.user.oauth2.handler.CustomSuccessHandler;
 import com.douzone.surveymanagement.user.oauth2.service.CustomOAuth2UserService;
 import com.douzone.surveymanagement.user.oauth2.util.JWTFilter;
@@ -10,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -41,16 +42,19 @@ public class SecurityConfig {
             .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http
-                .logout() // 로그아웃을 활성화
-                .logoutUrl("/api/oauth2/logout") // 로그아웃을 처리할 URL
-                .logoutSuccessUrl("/login") // 로그아웃 성공 후 리다이렉트할 URL
-                .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
-                .deleteCookies("Authorization") // 로그아웃 시 Authorization 쿠키 삭제
-                .deleteCookies("JSESSIONID") // 로그아웃 시 JSESSIONID 쿠키 삭제
-                .permitAll();
-
         http    .addFilterAfter(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .anonymous(anonymousConfigurer -> {
+                    UserDTO anonymousUserDTO = new UserDTO(
+                            "Anonymous", // 사용자 이름
+                            "anonymous@example.com", // 익명 이메일
+                            "ANONYMOUS" // 역할
+                    );
+                    anonymousConfigurer.principal(new CustomOAuth2User(
+                            anonymousUserDTO
+                    ));
+                });
 
         http
                 .oauth2Login((oauth2) -> oauth2

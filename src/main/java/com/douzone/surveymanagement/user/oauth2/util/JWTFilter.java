@@ -40,6 +40,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 if (cookie.getName().equals("Authorization")) {
 
+                    log.info("쿠키 자체는 존재함");
                     authorization = cookie.getValue();
                 }
             }
@@ -47,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
         //Authorization 헤더 검증
         if (authorization == null) {
 
-            log.info("token is null");
+            log.info("인증된 사용자가 아님");
             filterChain.doFilter(request, response);
 
             //조건이 해당되면 메소드 종료 (필수)

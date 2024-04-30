@@ -14,6 +14,8 @@ import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,10 +57,10 @@ public class SurveyAttendController {
         @PathVariable("surveyNo") long surveyNo,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         boolean isSurveyCreatedByUser = querySurveyService.isSurveyCreatedByUser(
-                userInfo.getUserNo(),
+                userInfo.map(UserInfo::getUserNo).orElse(0L),
             surveyNo
         );
 

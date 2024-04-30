@@ -9,6 +9,8 @@ import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
 import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -65,9 +67,9 @@ public class QuerySurveyController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
 
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> weeklySurvey = querySurveyService.readWeeklySurvey(userNo);
             return ResponseEntity.ok(weeklySurvey);
     }
@@ -83,9 +85,9 @@ public class QuerySurveyController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> recentSurvey = querySurveyService.readRecentSurvey(userNo);
         return ResponseEntity.ok(recentSurvey);
     }
@@ -100,9 +102,9 @@ public class QuerySurveyController {
     public ResponseEntity<List<SurveyDetailInfoDto>> closingSurveyList(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> closingSurvey = querySurveyService.readClosingSurvey(userNo);
         return ResponseEntity.ok(closingSurvey);
     }
@@ -122,9 +124,9 @@ public class QuerySurveyController {
         @RequestParam("page") int page,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> allSurvey = querySurveyService.getSurveyAll(page, userNo);
         return ResponseEntity.ok(allSurvey);
     }
@@ -141,9 +143,9 @@ public class QuerySurveyController {
         @RequestParam("page") int page,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> closeSurvey = querySurveyService.selectClosing(page, userNo);
         return ResponseEntity.ok(closeSurvey);
     }
@@ -160,9 +162,9 @@ public class QuerySurveyController {
         @RequestParam("page") int page,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> postSurvey = querySurveyService.selectPost(page, userNo);
         return ResponseEntity.ok(postSurvey);
     }
@@ -173,9 +175,9 @@ public class QuerySurveyController {
         @RequestParam("searchWord") String searchWord,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        long userNo = userInfo.getUserNo();
+        long userNo = userInfo.map(UserInfo::getUserNo).orElse(0L); // 기본값으로 0을 사용
         List<SurveyDetailInfoDto> findSurvey =
             querySurveyService.searchSurveyByKeyword(searchWord, userNo);
         return ResponseEntity.ok(findSurvey);
@@ -197,11 +199,11 @@ public class QuerySurveyController {
         @PathVariable("surveyNo") long surveyNo,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         SurveyDetailInfoDto surveyDetails =
             querySurveyService.findOneSurveyDetailsBySurveyNo(
-                    userInfo.getUserNo(),
+                    userInfo.map(UserInfo::getUserNo).orElse(0L),
                 surveyNo
             );
 

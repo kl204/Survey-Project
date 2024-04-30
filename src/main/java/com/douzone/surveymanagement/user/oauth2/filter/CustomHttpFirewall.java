@@ -18,6 +18,7 @@ public class CustomHttpFirewall extends StrictHttpFirewall {
     public FirewalledRequest getFirewalledRequest(HttpServletRequest request) throws RequestRejectedException {
 
             log.info("getFirewalledRequest 실행");
+            log.info("어디서 실행된 것인지 : " + request.toString());
 
             FirewalledRequest firewalledRequest = super.getFirewalledRequest(request);
 

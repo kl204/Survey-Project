@@ -11,6 +11,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -45,9 +47,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String userEmail = oAuth2Response.getEmail();
 
         log.info("네이버 서버 이메일 : " + userEmail);
-        UserInfo existData = userMapper.findByUserEmail(userEmail);
+        Optional<UserInfo> existData = userMapper.findByUserEmail(userEmail);
 
-        if (existData == null) {
+        if (existData.isEmpty()) {
             log.info("회원이 존재하지 않음");
             //리소스 서버에서 발급 받은 정보로 사용자를 특정할 아이디값을 만듬
             String userName = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
@@ -59,9 +61,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userMapper.registUser(userInfo);
 
-            UserInfo checkUser = userMapper.findByUserEmail(userEmail);
+            Optional<UserInfo> checkUser = userMapper.findByUserEmail(userEmail);
 
-            log.info("제대로 들어갔는지 확인 : "+ checkUser.getUserNickname());
+            String userCheck = checkUser.map(UserInfo::getUserNickname).orElse("Anonymous member");
+            log.info("제대로 들어갔는지 확인 : "+ userCheck);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setUsername(userName);
@@ -76,7 +79,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setUsername(oAuth2Response.getName());
             userDTO.setUserEmail(oAuth2Response.getEmail());
             userDTO.setName(oAuth2Response.getName());
-            userDTO.setRole(existData.getUserRole());
+            userDTO.setRole(existData.map(UserInfo::getUserRole).orElse("Anonymous_user"));
 
             return new CustomOAuth2User(userDTO);
         }

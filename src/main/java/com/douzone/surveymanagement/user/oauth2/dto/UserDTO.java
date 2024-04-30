@@ -11,4 +11,13 @@ public class UserDTO {
     private String name;
     private String username;
     private String userEmail;
+
+    public UserDTO() {
+    }
+
+    public UserDTO(String anonymous, String mail, String anonymous1) {
+        this.role = anonymous;
+        this.userEmail = mail;
+        this.username = anonymous1;
+    }
 }

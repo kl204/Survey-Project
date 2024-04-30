@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 
 /**
  * 설문을 등록하는 API를 정의한 Controller 클래스 입니다.
@@ -59,9 +61,9 @@ public class CommandSurveyController {
         @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        surveyCreateDto.getSurveyInfoCreateDto().setUserNo(userInfo.getUserNo());
+        surveyCreateDto.getSurveyInfoCreateDto().setUserNo(userInfo.map(UserInfo::getUserNo).orElse(0L));
 
         commandSurveyService.insertSurvey(
             surveyCreateDto.getSurveyInfoCreateDto(),
@@ -90,10 +92,10 @@ public class CommandSurveyController {
         @AuthenticationPrincipal CustomOAuth2User customOAuth2User
 
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         boolean surveyCreatedByUser = querySurveyService.isSurveyCreatedByUser(
-                userInfo.getUserNo(),
+                userInfo.map(UserInfo::getUserNo).orElse(0L),
             surveyUpdateDto.getSurveyInfoUpdateDto().getSurveyNo()
         );
 
@@ -126,10 +128,10 @@ public class CommandSurveyController {
         @PathVariable(value = "surveyNo") long surveyNo,
         @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         if (!querySurveyService.isSurveyCreatedByUser(
-                userInfo.getUserNo(),
+                userInfo.map(UserInfo::getUserNo).orElse(0L),
             surveyNo
         )) {
             throw new BadRequestException("선택한 설문을 삭제할 수 없습니다.");

@@ -9,6 +9,8 @@ import com.douzone.surveymanagement.user.oauth2.dto.CustomOAuth2User;
 import com.douzone.surveymanagement.user.oauth2.mapper.OAuth2UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -54,9 +56,9 @@ public class MySurveyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
         List<MySurveyDTO> myWriteSurveys =
-            mySurveyServiceImpl.selectMySurveysWithSorting(userInfo.getUserNo());
+            mySurveyServiceImpl.selectMySurveysWithSorting(userInfo.map(UserInfo::getUserNo).orElse(0L));
 
         return ResponseEntity.ok(CommonResponse.successOf(myWriteSurveys));
     }
@@ -79,9 +81,9 @@ public class MySurveyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
         List<MySurveyDTO> myAttendSurveys =
-            mySurveyServiceImpl.selectMyParticipatedSurveys(userInfo.getUserNo());
+            mySurveyServiceImpl.selectMyParticipatedSurveys(userInfo.map(UserInfo::getUserNo).orElse(0L));
 
         return ResponseEntity.ok(CommonResponse.successOf(myAttendSurveys));
     }
@@ -100,9 +102,9 @@ public class MySurveyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        mySurveyDTO.setUserNo(userInfo.getUserNo());
+        mySurveyDTO.setUserNo(userInfo.map(UserInfo::getUserNo).orElse(0L));
         boolean isDeleted = mySurveyServiceImpl.deleteMySurveyInProgress(mySurveyDTO);
         if (isDeleted) {
             return ResponseEntity.ok(CommonResponse.successOf("Survey deleted successfully"));

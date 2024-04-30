@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -34,7 +35,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String userEmail = customUserDetails.getUserEmail();
         String username = customUserDetails.getUsername();
-        UserInfo userInfo = oAuth2UserMapper.findByUserEmail(userEmail);
+        Optional<UserInfo> userInfo = oAuth2UserMapper.findByUserEmail(userEmail);
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -44,7 +45,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtUtil.createJwt(username, userEmail, role, 60*60*60L);
         String loginSession = "true";
 
-        System.out.println(userInfo.getUserNickname());
+        System.out.println(userInfo.map(UserInfo::getUserNickname).orElse("Anonymous_user"));
 
         response.addCookie(createCookie("Authorization", token, true));
         response.addCookie(createCookie("loginSession",loginSession , false));

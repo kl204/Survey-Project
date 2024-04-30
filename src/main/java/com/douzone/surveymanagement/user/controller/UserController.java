@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 /**
  * 유저 API 컨트롤러 클래스입니다.
  *
@@ -50,9 +52,9 @@ public class UserController {
         @Valid @RequestBody UserModifyDTO userModifyDTO) {
 
         try {
-            UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+            Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-            userModifyDTO.setUserNo(userInfo.getUserNo());
+            userModifyDTO.setUserNo(userInfo.map(UserInfo::getUserNo).orElse(0L));
             userServiceImpl.updateUserNickName(userModifyDTO);
             return ResponseEntity
                 .ok()
@@ -74,10 +76,10 @@ public class UserController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
         @RequestBody ImageModifyDTO userImage) {
 
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
         boolean updated =
-            userServiceImpl.updateUserImage(userInfo.getUserNo(), userImage.getUserImage());
+            userServiceImpl.updateUserImage(userInfo.map(UserInfo::getUserNo).orElse(0L), userImage.getUserImage());
 
         if (updated) {
             return ResponseEntity
@@ -99,9 +101,9 @@ public class UserController {
         if (customOAuth2User == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        UserInfo userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
+        Optional<UserInfo> userInfo = userMapper.findByUserEmail(customOAuth2User.getUserEmail());
 
-        UserDTO userDTO = userServiceImpl.getUserByUserNo(userInfo.getUserNo());
+        UserDTO userDTO = userServiceImpl.getUserByUserNo(userInfo.map(UserInfo::getUserNo).orElse(0L));
 
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
